@@ -1,0 +1,12 @@
+node_modules/
+.env
+
+# Private data: real Meta exports and generated personal content stay local only
+data/input/*
+!data/input/.gitkeep
+data/output/*
+!data/output/.gitkeep
+data/style-guide.md
+data/hashtag-stats.json
+data/hashtag-cache/
+data/feedback.jsonl

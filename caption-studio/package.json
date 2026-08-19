@@ -1,0 +1,17 @@
+{
+  "name": "caption-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Instagram caption / hashtag generator for photographers (local-only tool).",
+  "scripts": {
+    "build-style-guide": "node src/cli/build-style-guide.js",
+    "generate-caption": "node src/cli/generate-caption.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.117.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
