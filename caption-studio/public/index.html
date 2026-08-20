@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>caption studio</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<header class="app-header">
+  <h1>caption studio</h1>
+  <nav class="tabs">
+    <button type="button" class="tab-btn is-active" data-tab="generate">生成</button>
+    <button type="button" class="tab-btn" data-tab="feedback">フィードバック分析</button>
+  </nav>
+</header>
+
+<main>
+  <section id="tab-generate" class="tab-panel is-active">
+
+    <div class="field">
+      <label for="genre">ジャンル</label>
+      <input id="genre" type="text" placeholder="例: 和装前撮り" />
+    </div>
+
+    <div class="field">
+      <label for="note">撮影メモ</label>
+      <input id="note" type="text" placeholder="例: 神社前撮り 和装 春" />
+    </div>
+
+    <div class="field">
+      <label for="extra">追加指定(任意・最優先で反映されます)</label>
+      <textarea id="extra" rows="2" placeholder="例: 今回は神社名は出さない、季節感を強めに"></textarea>
+    </div>
+
+    <div class="field">
+      <label>画像(ドラッグ&ドロップ、複数枚可)</label>
+      <div id="dropzone" class="dropzone">
+        <span>ここに画像をドロップ、またはクリックして選択</span>
+        <input id="fileInput" type="file" accept="image/*" multiple hidden />
+      </div>
+      <div id="thumbs" class="thumbs"></div>
+      <div id="imageSourceBadge" class="badge" hidden></div>
+      <textarea id="imageSummary" rows="2" placeholder="画像の内容(自動解析されます。手で編集・入力もできます)"></textarea>
+    </div>
+
+    <button id="generateBtn" type="button" class="primary-btn">生成する</button>
+    <div id="status" class="status" role="status"></div>
+
+    <section id="captionSection" class="result-section" hidden>
+      <h2>キャプション候補</h2>
+      <div id="captionCards" class="caption-cards"></div>
+    </section>
+
+    <section id="hashtagSection" class="result-section" hidden>
+      <div class="section-header-row">
+        <h2>ハッシュタグ提案</h2>
+        <div class="hashtag-meta">
+          <span id="cacheUpdatedAt" class="muted"></span>
+          <button id="refreshTagsBtn" type="button" class="secondary-btn">タグ相場を再調査</button>
+        </div>
+      </div>
+      <div id="hashtagDiff" class="hashtag-diff" hidden></div>
+      <div id="hashtagTiers" class="hashtag-tiers"></div>
+      <div class="field">
+        <label for="manualTags">追加のタグ(カンマ区切り、任意。定番の屋号タグなどをここに)</label>
+        <input id="manualTags" type="text" placeholder="例: #encuore写真館" />
+      </div>
+    </section>
+
+    <section id="previewSection" class="result-section" hidden>
+      <h2>完成形プレビュー</h2>
+      <textarea id="previewText" rows="10"></textarea>
+      <button id="copyBtn" type="button" class="primary-btn">コピー</button>
+      <span id="copyStatus" class="muted"></span>
+    </section>
+
+  </section>
+
+  <section id="tab-feedback" class="tab-panel">
+    <h2>フィードバック分析</h2>
+    <button id="loadStatsBtn" type="button" class="secondary-btn">最新の集計を読み込む</button>
+    <div id="feedbackStats"></div>
+  </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>

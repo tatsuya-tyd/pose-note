@@ -1,0 +1,236 @@
+:root {
+  --bg: #faf9f7;
+  --fg: #2b2825;
+  --muted: #7a7570;
+  --border: #ddd6cf;
+  --accent: #a9764f;
+  --accent-fg: #fff;
+  --card-bg: #fff;
+  --danger-bg: #fbeceb;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+}
+
+.app-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--card-bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.tabs { display: flex; gap: 0.5rem; }
+
+.tab-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.tab-btn.is-active {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.tab-panel { display: none; }
+.tab-panel.is-active { display: block; }
+
+.field { margin-bottom: 1rem; }
+
+.field label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--fg);
+}
+
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.dropzone.is-dragover { border-color: var(--accent); color: var(--accent); }
+
+.thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.thumbs img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--border);
+  color: var(--fg);
+  margin: 0.5rem 0;
+}
+
+.badge.is-fallback { background: var(--danger-bg); }
+
+.primary-btn, .secondary-btn {
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+}
+
+.primary-btn {
+  background: var(--accent);
+  color: var(--accent-fg);
+  width: 100%;
+}
+
+.secondary-btn {
+  background: var(--card-bg);
+  color: var(--accent);
+}
+
+.status {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  min-height: 1.2em;
+}
+
+.result-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.caption-cards { display: flex; flex-direction: column; gap: 0.8rem; }
+
+.caption-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem;
+  background: var(--card-bg);
+}
+
+.caption-card.is-selected { border-color: var(--accent); border-width: 2px; }
+
+.caption-card .angle {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.caption-card textarea { min-height: 5rem; }
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.section-header-row h2 { margin: 0; }
+
+.hashtag-meta { display: flex; align-items: center; gap: 0.5rem; }
+
+.muted { color: var(--muted); font-size: 0.8rem; }
+
+.hashtag-diff {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem;
+  margin: 0.6rem 0;
+  font-size: 0.85rem;
+}
+
+.tag-tier { margin-top: 0.8rem; }
+.tag-tier h3 { font-size: 0.9rem; margin: 0 0 0.4rem; }
+
+.tag-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+}
+
+.tag-row .tag-reason { font-size: 0.8rem; color: var(--muted); }
+
+#previewText { min-height: 8rem; margin-bottom: 0.6rem; }
+
+.stat-block { margin-top: 1rem; }
+.stat-block h3 { font-size: 0.9rem; margin-bottom: 0.4rem; }
+
+.bar-row { margin-bottom: 0.4rem; font-size: 0.85rem; }
+
+.bar-track {
+  background: var(--border);
+  border-radius: 4px;
+  height: 10px;
+  overflow: hidden;
+  margin-top: 0.2rem;
+}
+
+.bar-fill { background: var(--accent); height: 100%; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1a18;
+    --fg: #eee9e3;
+    --muted: #a39c93;
+    --border: #3a3630;
+    --accent: #d3a06e;
+    --accent-fg: #1c1a18;
+    --card-bg: #26221f;
+    --danger-bg: #3a2422;
+  }
+}

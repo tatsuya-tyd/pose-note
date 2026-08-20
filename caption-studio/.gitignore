@@ -10,3 +10,4 @@ data/style-guide.md
 data/hashtag-stats.json
 data/hashtag-cache/
 data/feedback.jsonl
+data/feedback-meta.json

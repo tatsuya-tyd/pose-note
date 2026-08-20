@@ -6,10 +6,16 @@
   "description": "Instagram caption / hashtag generator for photographers (local-only tool).",
   "scripts": {
     "build-style-guide": "node src/cli/build-style-guide.js",
-    "generate-caption": "node src/cli/generate-caption.js"
+    "generate-caption": "node src/cli/generate-caption.js",
+    "research-hashtags": "node src/cli/research-hashtags.js",
+    "generate-hashtags": "node src/cli/generate-hashtags.js",
+    "analyze-image": "node src/cli/analyze-image.js",
+    "record-feedback": "node src/cli/record-feedback.js",
+    "feedback-report": "node src/cli/feedback-report.js",
+    "start": "node src/server.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.117.1"
+    "@google/genai": "^2.18.0"
   },
   "engines": {
     "node": ">=18"

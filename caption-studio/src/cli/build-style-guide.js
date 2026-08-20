@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { loadEnv } from "../lib/env.js";
 import { loadAllPosts } from "../lib/metaExport.js";
 import { buildHashtagStats } from "../lib/hashtagStats.js";
-import { askClaude, getModel } from "../lib/claudeClient.js";
+import { askGemini, getGeminiModel, describeGeminiError } from "../lib/geminiClient.js";
 import { buildStyleGuideUserPrompt, STYLE_GUIDE_SYSTEM_PROMPT } from "../lib/styleGuidePrompt.js";
 
 loadEnv();
@@ -51,12 +51,12 @@ async function main() {
   fs.writeFileSync(statsPath, JSON.stringify(hashtagStats, null, 2), "utf8");
   console.log(`  → ${hashtagStats.tags.length} 種類のタグを検出、保存先: ${statsPath}`);
 
-  console.log(`[3/4] Claude (${getModel()}) でスタイルガイドを生成中...（少し時間がかかります）`);
+  console.log(`[3/4] Gemini (${getGeminiModel()}) でスタイルガイドを生成中...（少し時間がかかります）`);
   const userPrompt = buildStyleGuideUserPrompt(posts);
-  const styleGuideMarkdown = await askClaude({
+  const styleGuideMarkdown = await askGemini({
     system: STYLE_GUIDE_SYSTEM_PROMPT,
     user: userPrompt,
-    maxTokens: 4000,
+    maxOutputTokens: 4000,
   });
 
   console.log("[4/4] 保存中...");
@@ -68,5 +68,6 @@ async function main() {
 
 main().catch((err) => {
   console.error("エラー:", err.message);
+  console.error(describeGeminiError(err).guidance);
   process.exit(1);
 });
