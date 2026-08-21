@@ -49,6 +49,7 @@ caption-studio/
       hashtagResearch.js     Web検索によるタグ相場リサーチ＋ジャンル別キャッシュ＋差分計算
       hashtagPrompt.js       タグ提案（3層20個程度）用プロンプト
       imageAnalysis.js       画像のビジョン解析＋手入力フォールバック解決
+      gptPromptBuilder.js    ChatGPT用プロンプト（画像解析結果＋撮影メモ＋スタイルガイド）の組み立て
       feedbackStore.js       選択・編集結果の記録・集計
       styleGuidePrompt.js    スタイルガイド生成用プロンプト
       captionPrompt.js       キャプション3案生成用プロンプト
@@ -58,6 +59,7 @@ caption-studio/
       research-hashtags.js   Phase 3: ジャンル別タグ相場の初回調査／再調査／一覧
       generate-hashtags.js   Phase 3: タグ提案（3層20個程度）生成
       analyze-image.js       Phase 4: 画像1枚の解析結果を確認する smoke test 用CLI
+      build-gpt-prompt.js    画像解析結果＋撮影メモ等をChatGPT用プロンプトにまとめてクリップボードにコピー
       record-feedback.js     Phase 6: フィードバックJSONLの一括投入
       feedback-report.js     Phase 6: フィードバック集計のテキスト表示
     server.js                Phase 5: ローカルUIサーバー（Node標準 http、唯一のAPIエントリーポイント）
@@ -100,6 +102,9 @@ caption-studio/
 
 4. **（任意）ローカルUIサーバーのポート変更**
    - 既定は `3000`。使用中の場合は `.env` の `PORT=` で変更できる。
+   - `EADDRINUSE`で起動に失敗する場合、他のローカルプロジェクトが3000番を使っていないか
+     `lsof -i :3000` で確認する（この環境では `encuore-site` のNext.js devサーバーが3000番を
+     使っていたため、caption-studioは`3001`に変更した）。
 
 ---
 
@@ -115,7 +120,10 @@ caption-studio/
   生成すべてに共通してかかるため、投稿準備1回（画像解析＋キャプション生成＋タグ提案）で
   3〜4回消費する計算になり、1日に何件も投稿準備をすると枯渇しうる。
   - タグ相場リサーチは**キャッシュ機構**（再調査はUIのボタン／CLIの`--refresh`を押したときだけ）
-    でそもそもの呼び出し回数を抑えている。
+    でそもそもの呼び出し回数を抑えている。ただし実地確認では、**Web検索（Grounding）機能は
+    通常のテキスト生成よりもさらに厳しい制限が別枠でかかっているらしく、他の呼び出しが
+    成功する状態でも単独で即座に429エラーになることがあった**。ハッシュタグをChatGPT側で
+    作る運用（5節）にするなら、この機能自体の優先度は下げてよい。
   - 上限に達した場合、`src/lib/geminiClient.js` の `describeGeminiError()` が
     `rate_limit` / `quota_exceeded` / `auth_error` / `transient` / `other` を判定し、
     CLI・UI双方に **「今回だけ Claude（このプロジェクトを操作している Chat）に直接
@@ -173,6 +181,19 @@ npm start
 （例：「Geminiの無料枠の上限に達した可能性があります…今回だけ Claude に直接…依頼してください」）。
 その場合は `data/style-guide.md` の内容と撮影メモを、このプロジェクトを操作している
 Claude（Chat/Claude Code）にそのまま伝えてキャプションを書いてもらう、という運用でしのぐ。
+
+**キャプション・タグをChatGPTで作りたい場合：** 「生成する」ボタンは使わず、その下の
+「GPT用プロンプトを作る」を使う。**ChatGPT側に既に独自のキャプション／ハッシュタグ選定
+ルール（カスタムインストラクション等）が設定されている前提**で、プロンプトは意図的に
+「画像の内容」「撮影メモ」「追加の要望」だけに絞っている（「〜してください」という指示文や
+スタイルガイドは含めない＝GPT側の設定と二重・矛盾しないようにするため）。スタイルガイドが
+必要な場合だけチェックボックスで追加できる。Gemini呼び出しは画像解析の1回のみで、文章生成
+自体は行わない＝クォータをほぼ消費しない。ChatGPT側に貼り付けて送信するのは手動。
+
+**iPhoneから使う：** `npm start` 実行時に表示される `同じWi-Fi内のiPhone等から: http://<LAN IP>:<PORT>`
+のURLを、PCと同じWi-Fiに繋いだiPhoneのSafariで開く。クラウドデプロイはしていないため、
+外出先（別ネットワーク）からは使えない。またLAN経由のhttpアクセスはブラウザのセキュアコンテキスト
+制限により、コピー機能が自動で効かない場合がある（その場合はテキストが選択状態になるので手動でコピー）。
 日付が変わればまた自動生成が使えるようになる。
 
 ### Phase 1: スタイルガイド生成（初回のみ・CLI）
@@ -208,6 +229,18 @@ npm run generate-caption -- --note "神社前撮り 和装 春" --image ./sample
 - `--save`：生成結果を `data/output/` に保存する
 
 `data/style-guide.md` がまだ無い状態でも、仮のスタイルガイドで動作する（警告が出る）。
+
+### ChatGPT用プロンプト作成（CLI）
+
+```bash
+npm run build-gpt-prompt -- --note "石垣島 夕焼け 海"
+npm run build-gpt-prompt -- --note "石垣島 夕焼け 海" --image ./samples/xxx.jpg
+npm run build-gpt-prompt -- --note "石垣島 夕焼け 海" --with-style-guide  # 通常は不要
+```
+
+「画像の内容」「撮影メモ」「追加の要望」だけをまとめてクリップボードにコピーする（macOSの
+`pbcopy`使用、失敗時はターミナルに表示するのみ）。ChatGPT側に既にルールが設定されている
+前提のため、指示文やスタイルガイドはデフォルトで含めない。
 
 ### Phase 3: タグ相場リサーチ＆タグ提案（CLI）
 

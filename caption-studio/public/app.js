@@ -296,6 +296,59 @@ function makeDiffLine(text) {
   return div;
 }
 
+// --- GPT prompt (Gemini writes the photo description only; captions/hashtags
+// are left to the user's own ChatGPT session) ---
+el("buildGptPromptBtn").addEventListener("click", async () => {
+  const note = el("note").value.trim();
+  if (!note) {
+    setStatus("撮影メモを入力してください。");
+    return;
+  }
+  setStatus("GPT用プロンプトを作成中...");
+  el("buildGptPromptBtn").disabled = true;
+  try {
+    const res = await fetch("/api/build-gpt-prompt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        note,
+        extra: el("extra").value.trim(),
+        imageSummary: el("imageSummary").value.trim(),
+        includeStyleGuide: el("includeStyleGuide").checked,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw errorWithGuidance(data, "プロンプト作成に失敗しました");
+
+    const textarea = el("gptPromptText");
+    textarea.value = data.prompt;
+    textarea.hidden = false;
+    el("copyGptPromptBtn").hidden = false;
+    el("gptPromptCopyStatus").textContent = "";
+    setStatus("GPT用プロンプトを作成しました。");
+  } catch (err) {
+    setStatus(`エラー: ${err.message}`);
+  } finally {
+    el("buildGptPromptBtn").disabled = false;
+  }
+});
+
+el("copyGptPromptBtn").addEventListener("click", async () => {
+  const textarea = el("gptPromptText");
+  try {
+    await navigator.clipboard.writeText(textarea.value);
+    el("gptPromptCopyStatus").textContent = "コピーしました";
+  } catch {
+    // iOS Safari often blocks the Clipboard API over plain HTTP (LAN access
+    // isn't a secure context), so fall back to selecting the text.
+    textarea.hidden = false;
+    textarea.focus();
+    textarea.select();
+    el("gptPromptCopyStatus").textContent =
+      "自動コピーできませんでした。選択状態にしたので、そのままコピーしてください。";
+  }
+});
+
 // --- preview & copy ---
 function updatePreview() {
   if (state.captions.length === 0) return;

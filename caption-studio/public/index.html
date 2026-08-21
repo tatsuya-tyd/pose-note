@@ -47,6 +47,19 @@
     <button id="generateBtn" type="button" class="primary-btn">生成する</button>
     <div id="status" class="status" role="status"></div>
 
+    <section class="result-section">
+      <h2>GPT用プロンプト</h2>
+      <p class="muted">画像の内容だけGeminiで文章化して、キャプション・タグはGPT側で作りたい場合はこちら。</p>
+      <label class="checkbox-label">
+        <input id="includeStyleGuide" type="checkbox" />
+        スタイルガイドを含める(通常は不要。GPT側に文体ルールが無い場合のみ)
+      </label>
+      <button id="buildGptPromptBtn" type="button" class="secondary-btn">GPT用プロンプトを作る</button>
+      <textarea id="gptPromptText" rows="6" hidden></textarea>
+      <button id="copyGptPromptBtn" type="button" class="primary-btn" hidden>コピー</button>
+      <span id="gptPromptCopyStatus" class="muted"></span>
+    </section>
+
     <section id="captionSection" class="result-section" hidden>
       <h2>キャプション候補</h2>
       <div id="captionCards" class="caption-cards"></div>

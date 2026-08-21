@@ -3,8 +3,10 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { networkInterfaces } from "node:os";
 import { loadEnv } from "./lib/env.js";
 import { buildCaptionSystemPrompt, buildCaptionUserPrompt } from "./lib/captionPrompt.js";
+import { buildGptPrompt } from "./lib/gptPromptBuilder.js";
 import { buildHashtagUserPrompt, HASHTAG_SYSTEM_PROMPT } from "./lib/hashtagPrompt.js";
 import { researchGenre, loadCache } from "./lib/hashtagResearch.js";
 import { analyzeImages, summaryToText } from "./lib/imageAnalysis.js";
@@ -107,6 +109,18 @@ route("POST", "/api/analyze-image", async (req, res, params, body) => {
   }
 });
 
+route("POST", "/api/build-gpt-prompt", async (req, res, params, body) => {
+  const { note, extra, imageSummary, includeStyleGuide } = body;
+  if (!note || !note.trim()) return sendJson(res, 400, { error: "note は必須です" });
+
+  const stylePath = path.join(dataDir, "style-guide.md");
+  const styleGuideMarkdown =
+    includeStyleGuide !== false && fs.existsSync(stylePath) ? fs.readFileSync(stylePath, "utf8") : "";
+
+  const prompt = buildGptPrompt({ note, imageSummary, extra: extra ?? "", styleGuideMarkdown });
+  sendJson(res, 200, { prompt });
+});
+
 route("POST", "/api/generate-caption", async (req, res, params, body) => {
   const { note, extra, imageSummary } = body;
   if (!note || !note.trim()) return sendJson(res, 400, { error: "note は必須です" });
@@ -205,7 +219,22 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+// Bound to all interfaces (Node's default with no host arg) so it's reachable
+// from an iPhone on the same Wi-Fi — printing the LAN address makes that usable
+// without the user having to look it up themselves.
+function getLanAddress() {
+  const nets = networkInterfaces();
+  for (const addrs of Object.values(nets)) {
+    for (const addr of addrs ?? []) {
+      if (addr.family === "IPv4" && !addr.internal) return addr.address;
+    }
+  }
+  return null;
+}
+
 server.listen(PORT, () => {
   console.log(`caption-studio server: http://localhost:${PORT}`);
+  const lan = getLanAddress();
+  if (lan) console.log(`同じWi-Fi内のiPhone等から: http://${lan}:${PORT}`);
   console.log(`Gemini model: ${getGeminiModel()}`);
 });

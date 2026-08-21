@@ -10,6 +10,7 @@
     "research-hashtags": "node src/cli/research-hashtags.js",
     "generate-hashtags": "node src/cli/generate-hashtags.js",
     "analyze-image": "node src/cli/analyze-image.js",
+    "build-gpt-prompt": "node src/cli/build-gpt-prompt.js",
     "record-feedback": "node src/cli/record-feedback.js",
     "feedback-report": "node src/cli/feedback-report.js",
     "start": "node src/server.js"
